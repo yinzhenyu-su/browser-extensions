@@ -7,12 +7,17 @@
 // @match        https://music.163.com/
 // @require      https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js
 // @require      https://unpkg.com/ajax-hook@2.0.3/dist/ajaxhook.min.js
-// @require      https://cdn.bootcdn.net/ajax/libs/layer/1.8.5/layer.min.js
-// @grant        none
+// @require      https://cdnjs.cloudflare.com/ajax/libs/layer/3.1.1/layer.min.js
+// @resource     LAY_CSS https://cdnjs.cloudflare.com/ajax/libs/layer/3.1.1/theme/default/layer.min.css
+// @grant        GM_getResourceText
+// @grant        GM_addStyle
 // ==/UserScript==
 
 (function () {
   'use strict';
+
+  const laycss = GM_getResourceText('LAY_CSS')
+  GM_addStyle(laycss);
   let musicUrl = '';
   ah.proxy({
     //请求发起前进入
@@ -114,13 +119,16 @@
     document.body.appendChild(input)
     input.select();
     let result = document.execCommand('copy')
-    if (result) console.log('copy success')
+    if (result) {
+        console.log('copy success')
+        layer.msg('复制成功');
+    }
     document.body.removeChild(input)
   }
 
   function download({url,name}) {
     let a = document.createElement('a')
-    a.setAttribute('download', name)
+    a.setAttribute('download', '')
     a.href = url;
     document.body.appendChild(a);
     a.click()
@@ -140,7 +148,8 @@
 
   Doc.loaded('.m-playbar.m-playbar-lock').then(({document})=>{
     document.insertAdjacentHTML('beforeend', `<div style="position:absolute;right:0;top:-20px;width:100px;height:53px;"><a id="ex-music" href="javascript:;">下载</a></div>`)
-    document.querySelector('#ex-music').addEventListener('click', function(){ download({url:musicUrl,name:''}) })
+    let name = document.querySelector('.f-thide.name.fc1.f-fl').innerText
+    document.querySelector('#ex-music').addEventListener('click', function(){ download({url:musicUrl,name:name}) })
   }).catch((e) => {
     console.log(e)
   })
