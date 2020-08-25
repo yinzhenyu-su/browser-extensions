@@ -7,6 +7,7 @@
 // @match        https://music.163.com/
 // @require      https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js
 // @require      https://unpkg.com/ajax-hook@2.0.3/dist/ajaxhook.min.js
+// @require      https://cdn.bootcdn.net/ajax/libs/layer/1.8.5/layer.min.js
 // @grant        none
 // ==/UserScript==
 
@@ -117,11 +118,10 @@
     document.body.removeChild(input)
   }
 
-  function download() {
-    console.log('download',musicUrl)
+  function download({url,name}) {
     let a = document.createElement('a')
-    a.download = 'download';
-    a.href = musicUrl;
+    a.setAttribute('download', name)
+    a.href = url;
     document.body.appendChild(a);
     a.click()
     document.body.removeChild(a)
@@ -132,7 +132,7 @@
   Iframe.loaded('#flag_play_addto_btn_wrapper').then(({ document, element }) => {
     iframe.context = document;
     element.insertAdjacentHTML('beforeend', `<a id="ex-copy" class="u-btni u-btni-dl" href="javascript:;" style="margin-top:14px" ><i>复制歌单</i></a>`)
-    document.querySelector('#ex-copy').addEventListener('click', copyToClipboard(getCopyList(document)))
+    document.querySelector('#ex-copy').addEventListener('click', function(){copyToClipboard(getCopyList(document))})
 
   }).catch((e) => {
     console.log(e)
@@ -140,7 +140,7 @@
 
   Doc.loaded('.m-playbar.m-playbar-lock').then(({document})=>{
     document.insertAdjacentHTML('beforeend', `<div style="position:absolute;right:0;top:-20px;width:100px;height:53px;"><a id="ex-music" href="javascript:;">下载</a></div>`)
-    document.querySelector('#ex-music').addEventListener('click', download)
+    document.querySelector('#ex-music').addEventListener('click', function(){ download({url:musicUrl,name:''}) })
   }).catch((e) => {
     console.log(e)
   })
